@@ -6,6 +6,7 @@
 ExportedObj/
 .vs/
 obj/
+bin/
 *.svd
 *.userprefs
 /*.csproj
