@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using Starship.Core.AI;
-using Starship.Core.AI.Planning;
+using Starship.Bot.Planning;
 
 namespace Starship.Bot.AI.DarkestDungeon {
     public class DarkestDungeonActionAccumulator : ActionAccumulator {

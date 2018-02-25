@@ -14,7 +14,7 @@ using Starship.Core.Utility;
 using Starship.Win32.Extensions;
 using Starship.Win32.Presentation;
 
-namespace Starship.Bot {
+namespace Starship.Bot.Windows {
     public partial class BotOverlay : Window, IsOverlay {
 
         public BotOverlay() {
@@ -25,17 +25,13 @@ namespace Starship.Bot {
 
             ControlBuilder = new WorkFlow()
                 .On<RectangleElement>(element => {
-                    Windows.MainWindow.Instance.Add(element);
+                    MainWindow.Instance.Add(element);
                     return new RegionControl(element);
                 })
                 //.On<TextElement>(element => new TextControl(element))
                 .Finally<FrameworkElement>(element => { MainCanvas.Children.Add(element); });
         }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e) {
-            GameBot.Start(this, BotConfigurations.darkestdungeon.ConvertToString());
-        }
-
+        
         public void Add(params VisualElement[] elements) {
             this.UI(() => { elements.ToList().ForEach(each => ControlBuilder.Process(each)); });
         }

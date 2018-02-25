@@ -4,18 +4,22 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.Remoting;
 using EasyHook;
+using Starship.Bot.Core;
 using Starship.Bot.Events;
+using Starship.Core.Extensions;
 using Starship.Core.Processing;
 using Starship.Injection;
 
 namespace Starship.Bot.Plugins {
     public class ImageCapturePlugin : GamePlugin {
 
+        public ImageCapturePlugin() {
+            LastFrameUpdate = DateTime.Now;
+        }
+
         protected override void OnGameLoaded(GameLoaded e) {
             base.OnGameLoaded(e);
-
-            return;
-
+      
             switch (Type.ToLower()) {
                 case "opengl":
                     BeginOpenGLImageCapture();
@@ -24,6 +28,17 @@ namespace Starship.Bot.Plugins {
                     BeginDefaultImageCapture();
                     break;
             }
+        }
+
+        protected override void Stopped() {
+            base.Stopped();
+
+            if (Proxy == null) {
+                return;
+            }
+
+            Proxy.Close();
+            Proxy = null;
         }
 
         private void BeginOpenGLImageCapture() {
@@ -35,13 +50,13 @@ namespace Starship.Bot.Plugins {
             ImageStreamProxy.ImageDataReceived += OnImageDataReceived;
             
             ImageStreamProxy.Settings = new ImageCaptureSettings {
-                Width = GameWindow.Width,
-                Height = GameWindow.Height,
+                Width = GameBot.Window.Width,
+                Height = GameBot.Window.Height,
                 Interval = 250
             };
 
             RemoteHooking.IpcCreateServer<ImageStreamProxy>(ref channel, WellKnownObjectMode.Singleton);
-            RemoteHooking.Inject(GameProcess.GetProcess().Id, path, path, channel);
+            RemoteHooking.Inject(GameBot.Process.GetProcess().Id, path, path, channel);
         }
 
         private void OnDebugReceived(string message) {
@@ -61,17 +76,9 @@ namespace Starship.Bot.Plugins {
                     //image.OpenInPaint();
                 }
 
+                IncrementFrame();
                 BroadcastImage(image);
             }
-        }
-
-        private void Close() {
-            if (Proxy == null) {
-                return;
-            }
-
-            Proxy.Close();
-            Proxy = null;
         }
 
         private void BeginDefaultImageCapture() {
@@ -80,24 +87,31 @@ namespace Starship.Bot.Plugins {
         }
         
         private void OnInterval() {
-            BroadcastImage(GameWindow.CaptureImage());
+            BroadcastImage(GameBot.Window.CaptureImage());
         }
 
         private void BroadcastImage(Image image) {
-            /*Frames += 1;
             
-            if (Frames == 60) {
+            /*if (Frames == 60) {
                 var elapsed = DateTime.Now - LastFrameUpdate;
                 FrameRate = Frames / Convert.ToInt32(elapsed.TotalSeconds);
             }*/
 
-            Publish(new ImageCaptured(image));
+            //Publish(new ImageCaptured(image));
+        }
+
+        private void IncrementFrame() {
+            Frames += 1;
+
+            if(LastFrameUpdate.HasElapsed(TimeSpan.FromSeconds(1))) {
+                Publish(new FrameRateUpdated { FPS = Frames });
+                Frames = 0;
+                LastFrameUpdate = DateTime.Now;
+            }
         }
 
         public string Type { get; set; }
-
-        private int FrameRate { get; set; }
-
+        
         private DateTime LastFrameUpdate { get; set; }
 
         private int Frames { get; set; }

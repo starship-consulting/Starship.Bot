@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Starship.Bot.Windows"
         mc:Ignorable="d"
-        Title="MainWindow" Width="800" Height="600">
-    <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
-        <ListBox x:Name="RegionList" HorizontalAlignment="Left" Width="200" SelectionChanged="RegionList_SelectionChanged" />
-    </StackPanel>
+        Title="MainWindow" Width="800" Height="600" Loaded="Window_Loaded">
+    <DockPanel Margin="5,5,5,5">
+        <ListBox x:Name="RegionList" DockPanel.Dock="Left" Width="200" SelectionChanged="RegionList_SelectionChanged" />
+        <TextBlock x:Name="FPS" DockPanel.Dock="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right"></TextBlock>
+    </DockPanel>
 </Window>

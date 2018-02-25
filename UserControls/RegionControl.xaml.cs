@@ -1,7 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Starship.Core.Extensions;
 using Starship.Win32.Presentation;
 
 namespace Starship.Bot.UserControls {

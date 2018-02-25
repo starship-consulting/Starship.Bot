@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Media;
+using Starship.Bot.Core;
 using Starship.Bot.Events;
 using Starship.Core.ChangeTracking;
 using Starship.Win32;
@@ -10,33 +11,40 @@ namespace Starship.Bot.Plugins {
         protected override void OnGameLoaded(GameLoaded e) {
             SetEditMode(true);
 
-            UI.SetParent(GameWindow.Handle);
+            Overlay.SetParent(Window.Handle);
 
-            GameWindow.BringToFront();
-            UpdateState(GameWindow);
+            Window.BringToFront();
+            UpdateState();
 
-            WindowTracker = new ChangeTracker<WindowInstance>(GameWindow);
+            WindowTracker = new ChangeTracker<WindowInstance>(Window);
             WindowTracker.Changed += OnWindowChanged;
-            WindowTracker.StartPolling(TimeSpan.FromSeconds(1), GameWindow.Update);
+            WindowTracker.StartPolling(TimeSpan.FromSeconds(1), Window.Update);
+        }
+
+        protected override void Stopped() {
+            base.Stopped();
+
+            WindowTracker.Dispose();
+            WindowTracker = null;
         }
 
         private void SetEditMode(bool active) {
             if (active) {
-                UI.SetBackgroundColor(Color.FromScRgb(1, 0, 0, 0));
+                Overlay.SetBackgroundColor(Color.FromScRgb(1, 0, 0, 0));
             }
             else {
-                UI.SetBackgroundColor(Color.FromScRgb(0, 0, 0, 0));
+                Overlay.SetBackgroundColor(Color.FromScRgb(0, 0, 0, 0));
             }
         }
 
         private void OnWindowChanged(WindowInstance window, ChangeTrackerState state) {
-            UpdateState(window);
+            UpdateState();
         }
 
-        private void UpdateState(WindowInstance window) {
+        private void UpdateState() {
             //if (window.State == WindowStates.Normal || window.State == WindowStates.Maximized) {
-                UI.SetSize(window.Width, window.Height);
-                UI.SetPosition(window.X, window.Y);
+                Overlay.SetSize(Window.Width, Window.Height);
+                Overlay.SetPosition(Window.X, Window.Y);
             //}
         }
         

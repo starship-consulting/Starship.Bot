@@ -4,9 +4,8 @@ using Starship.Bot.Events;
 
 namespace Starship.Bot.Plugins {
     public class GameStatePlugin : GamePlugin {
-        public override void Ready() {
-            base.Ready();
 
+        protected override void Run() {
             State = new DarkestDungeonGameState();
             On<DataLoaded<Region>>(OnRegionsLoaded);
         }

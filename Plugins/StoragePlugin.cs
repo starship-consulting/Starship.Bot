@@ -30,9 +30,7 @@ namespace Starship.Bot.Plugins {
             On<FileModified>(OnFileModified);
         }
         
-        public override void Start() {
-            base.Start();
-
+        protected override void Run() {
             LoadGameBindings();
             //LoadFromAzureTableStorage<Region>();
         }
@@ -58,6 +56,10 @@ namespace Starship.Bot.Plugins {
         }
 
         private void SaveGameBindings() {
+            if(!EnableSaving) {
+                return;
+            }
+
             var json = JsonConvert.SerializeObject(Bindings, Formatting.Indented);
             File.WriteAllText(GetLocalBindingsPath(), json);
         }
@@ -112,6 +114,8 @@ namespace Starship.Bot.Plugins {
         public string Partition { get; set; }
 
         public string ConnectionString { get; set; }
+
+        public bool EnableSaving { get; set; }
         
         private GameBindings Bindings { get; set; }
 

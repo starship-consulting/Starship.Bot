@@ -1,19 +1,22 @@
-﻿using Starship.Bot.Events;
+﻿using Starship.Bot.Core;
+using Starship.Bot.Events;
 using Starship.Core.Plugins;
 using Starship.Win32;
 
 namespace Starship.Bot.Plugins {
     public class GameLoaderPlugin : Plugin {
 
-        public override void Start() {
+        protected override void Run() {
             Process = new WindowsProcess(ProcessName);
 
             var process = Process.GetProcess();
 
             if (process != null) {
-                Publish(new GameLoaded {
-                    Process = Process
-                });
+                GameBot.Process = Process;
+                GameBot.Window = Process.GetWindow();
+                GameBot.Window.Update();
+
+                Publish(new GameLoaded());
             }
         }
 

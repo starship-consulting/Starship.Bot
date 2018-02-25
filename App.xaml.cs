@@ -8,19 +8,7 @@ namespace Starship.Bot {
             //AppDomain.CurrentDomain.AssemblyResolve += Resolver;
             //InitializeCefSharp();
         }
-
-        protected override void OnStartup(StartupEventArgs e) {
-            base.OnStartup(e);
-
-            var window = new Windows.MainWindow();
-            window.Closed += OnMainWindowClosed;
-            window.Show();
-        }
-
-        private void OnMainWindowClosed(object sender, EventArgs e) {
-            Shutdown();
-        }
-
+        
         /*[MethodImpl(MethodImplOptions.NoInlining)]
         private static void InitializeCefSharp() {
             var settings = new CefSettings();

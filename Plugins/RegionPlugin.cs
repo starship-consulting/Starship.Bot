@@ -13,11 +13,9 @@ namespace Starship.Bot.Plugins {
         }
 
         public override void Ready() {
-            base.Ready();
-
             On<DataLoaded<Region>>(OnRegionsLoaded);
             On<ImageCaptured>(OnImageCaptured);
-            UI.MouseStateChanged += OnMouseStateChanged;
+            Overlay.MouseStateChanged += OnMouseStateChanged;
         }
 
         public void WithRegion(string name, Action<RegionViewModel> action) {
@@ -45,7 +43,7 @@ namespace Starship.Bot.Plugins {
                 Regions.Add(viewmodel);
 
                 //viewmodel.Exists();
-                viewmodel.AddToUI(UI);
+                viewmodel.AddToUI(Overlay);
             }
         }
 
@@ -53,7 +51,7 @@ namespace Starship.Bot.Plugins {
             if (e.IsLeftButtonDown) {
                 if (EditingRegion == null) {
                     EditingRegion = new RegionViewModel(e.Position);
-                    EditingRegion.AddToUI(UI);
+                    EditingRegion.AddToUI(Overlay);
                     DragOrigin = e.Position;
                     return;
                 }

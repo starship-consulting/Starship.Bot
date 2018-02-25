@@ -2,6 +2,5 @@
 
 namespace Starship.Bot.Events {
     public class GameLoaded {
-        public WindowsProcess Process { get; set; }
     }
 }
