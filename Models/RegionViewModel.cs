@@ -2,12 +2,14 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using Starship.Bot.Core;
 using Starship.Bot.Interfaces;
 using Starship.Core.Events;
 using Starship.Core.Events.Standard;
 using Starship.Core.Extensions;
 using Starship.Core.Reflection;
 using Starship.Imaging;
+using Starship.Imaging.Extensions;
 using Starship.Win32.Extensions;
 using Starship.Win32.Presentation;
 using Point = System.Windows.Point;
@@ -29,6 +31,10 @@ namespace Starship.Bot.Models {
         public RegionViewModel(Point position) : this(new Region(position)) {
         }
 
+        public void Click() {
+            GameBot.Window.Click(GetCenter());
+        }
+
         public Point GetCenter() {
             return Rectangle.GetCenter();
         }
@@ -48,7 +54,7 @@ namespace Starship.Bot.Models {
                 EventStream.Publish(new FileModified(Id + ".png", Image.ToBytes(ImageFormat.Png)));
             }
 
-            var results = ImageScanner.Compare(Image, capture, 0.9f);
+            var results = Image.Compare(capture, 0.9f);
             Exists = results.Any(each => each.Similarity >= 0.95f && Rectangle.Equals(each.Rectangle));
             
             /*if (Exists) {

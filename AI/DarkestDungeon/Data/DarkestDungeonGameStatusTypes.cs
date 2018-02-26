@@ -3,6 +3,8 @@
         Loading = 0,
         ChooseCampaign,
         MainMenu,
-        CharacterSelect
+        CharacterSelect,
+        DungeonMenu,
+        InGame
     }
 }

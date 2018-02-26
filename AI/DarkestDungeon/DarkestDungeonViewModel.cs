@@ -2,11 +2,20 @@
 using Starship.Bot.AI.DarkestDungeon.Data;
 
 namespace Starship.Bot.AI.DarkestDungeon {
-    public class DarkestDungeonGameState {
+    public class DarkestDungeonViewModel {
 
-        public DarkestDungeonGameState() {
+        public DarkestDungeonViewModel() {
             Party = new List<GameCharacter>();
             Enemies = new List<GameCharacter>();
+        }
+
+        /// <summary>
+        /// Main sensor loop to synchronize entire game state
+        /// </summary>
+        public void UpdateState() {
+            if(DarkestDungeonGame.CampaignButton.Exists) {
+                Status = DarkestDungeonGameStatusTypes.MainMenu;
+            }
         }
         
         public bool IsLoaded { get; set; }

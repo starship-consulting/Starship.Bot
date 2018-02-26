@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
-using Starship.Bot.Core;
 using Starship.Bot.Events;
 using Starship.Core.ChangeTracking;
 using Starship.Win32;
@@ -9,7 +7,7 @@ namespace Starship.Bot.Plugins {
     public class OverlayPlugin : GamePlugin {
         
         protected override void OnGameLoaded(GameLoaded e) {
-            SetEditMode(true);
+            SetEditMode(EditMode);
 
             Overlay.SetParent(Window.Handle);
 
@@ -29,11 +27,13 @@ namespace Starship.Bot.Plugins {
         }
 
         private void SetEditMode(bool active) {
-            if (active) {
-                Overlay.SetBackgroundColor(Color.FromScRgb(1, 0, 0, 0));
+            EditMode = active;
+
+            if (EditMode) {
+                Overlay.MakeOpaque();
             }
             else {
-                Overlay.SetBackgroundColor(Color.FromScRgb(0, 0, 0, 0));
+                Overlay.MakeTransparent();
             }
         }
 
@@ -48,6 +48,8 @@ namespace Starship.Bot.Plugins {
             //}
         }
         
+        public bool EditMode { get; set; }
+
         private ChangeTracker<WindowInstance> WindowTracker { get; set; }
     }
 }

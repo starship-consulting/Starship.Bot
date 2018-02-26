@@ -19,6 +19,7 @@ namespace Starship.Bot.Windows {
 
         public BotOverlay() {
             InitializeComponent();
+            MakeTransparent();
 
             Elements = new List<VisualElement>();
             Mouse = new MouseState();
@@ -30,6 +31,14 @@ namespace Starship.Bot.Windows {
                 })
                 //.On<TextElement>(element => new TextControl(element))
                 .Finally<FrameworkElement>(element => { MainCanvas.Children.Add(element); });
+        }
+
+        public void MakeTransparent() {
+            SetBackgroundColor(Color.FromScRgb(0, 0, 0, 0));
+        }
+
+        public void MakeOpaque() {
+            SetBackgroundColor(Color.FromScRgb(1, 0, 0, 0));
         }
         
         public void Add(params VisualElement[] elements) {

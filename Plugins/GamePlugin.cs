@@ -24,5 +24,7 @@ namespace Starship.Bot.Plugins {
         protected WindowInstance Window => GameBot.Window;
 
         protected WindowsProcess Process => GameBot.Process;
+
+        protected RegionPlugin Regions => GameBot.Plugins.Get<RegionPlugin>();
     }
 }
