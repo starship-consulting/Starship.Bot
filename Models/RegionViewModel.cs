@@ -9,8 +9,8 @@ using Starship.Core.Events.Standard;
 using Starship.Core.Extensions;
 using Starship.Core.Reflection;
 using Starship.Imaging;
+using Starship.Imaging.Detection;
 using Starship.Imaging.Extensions;
-using Starship.Win32.Extensions;
 using Starship.Win32.Presentation;
 using Point = System.Windows.Point;
 using Region = Starship.Bot.Data.Region;
@@ -19,7 +19,7 @@ namespace Starship.Bot.Models {
     public class RegionViewModel {
 
         public RegionViewModel(Region region) {
-            Rectangle = Automapper.Map<RectangleElement>(region);
+            Rectangle = Automap.Map<RectangleElement>(region);
             Label = new TextElement();
             Id = region.Id;
             Name = region.Name;
@@ -54,7 +54,8 @@ namespace Starship.Bot.Models {
                 EventStream.Publish(new FileModified(Id + ".png", Image.ToBytes(ImageFormat.Png)));
             }
 
-            var results = Image.Compare(capture, 0.9f);
+            var matcher = new AccordImageMatcher(Image);
+            var results = matcher.Compare(capture, 0.9f);
             Exists = results.Any(each => each.Similarity >= 0.95f && Rectangle.Equals(each.Rectangle));
             
             /*if (Exists) {

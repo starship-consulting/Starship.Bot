@@ -9,11 +9,11 @@ namespace Starship.Bot.Plugins {
         public override void Ready() {
             base.Ready();
 
-            EventStream.On(EventTriggered);
+            //EventStream.On(EventTriggered);
         }
 
         private void EventTriggered(object e) {
-            Debug.WriteLine(DateTime.Now.ToLongTimeString() + ": " + e.GetType().Name);
+            //Debug.WriteLine(DateTime.Now.ToLongTimeString() + ": " + e.GetType().Name);
         }
     }
 }

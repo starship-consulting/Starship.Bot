@@ -52,7 +52,13 @@ namespace Starship.Bot.Plugins {
         }
 
         private Image LoadThumbnail(Region region)  {
-            return Image.FromFile(GetLocalImagePath() + region.Id + ".png");
+            var path = GetLocalImagePath() + region.Id + ".png";
+
+            if(File.Exists(path)) {
+                return Image.FromFile(path);
+            }
+
+            return null;
         }
 
         private void SaveGameBindings() {

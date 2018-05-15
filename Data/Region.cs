@@ -22,7 +22,7 @@ namespace Starship.Bot.Data {
         }
 
         public Region(RectangleElement element) : this() {
-            Automapper.Map(element, this);
+            Automap.Map(element, this);
         }
 
         [PrimaryKey]

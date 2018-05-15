@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Remoting;
+using System.Threading;
+using System.Threading.Tasks;
 using EasyHook;
 using Starship.Bot.Core;
 using Starship.Bot.Events;
@@ -14,6 +16,7 @@ namespace Starship.Bot.Plugins {
     public class ImageCapturePlugin : GamePlugin {
 
         public ImageCapturePlugin() {
+            Event = new ImageCaptured();
             LastFrameUpdate = DateTime.Now;
         }
 
@@ -97,9 +100,17 @@ namespace Starship.Bot.Plugins {
                 FrameRate = Frames / Convert.ToInt32(elapsed.TotalSeconds);
             }*/
 
-            //Publish(new ImageCaptured(image));
-        }
+            if(!IsProcessingImage) {
+                IsProcessingImage = true;
 
+                Task.Factory.StartNew(() => {
+                    Event.Image = image;
+                    Publish(Event);
+                    IsProcessingImage = false;
+                });
+            }
+        }
+        
         private void IncrementFrame() {
             Frames += 1;
 
@@ -111,7 +122,11 @@ namespace Starship.Bot.Plugins {
         }
 
         public string Type { get; set; }
+
+        private bool IsProcessingImage { get; set; }
         
+        private ImageCaptured Event { get; set; }
+
         private DateTime LastFrameUpdate { get; set; }
 
         private int Frames { get; set; }

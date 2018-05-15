@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Starship.Bot.Events;
 using Starship.Bot.Models;
 using Point = System.Windows.Point;
@@ -67,6 +68,7 @@ namespace Starship.Bot.Plugins {
             if (EditingRegion != null) {
                 Regions.Add(EditingRegion);
                 EditingRegion.Commit();
+                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(EditingRegion));
                 EditingRegion = null;
             }
         }
