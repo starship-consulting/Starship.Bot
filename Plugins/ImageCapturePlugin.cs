@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.Remoting;
-using System.Threading;
 using System.Threading.Tasks;
 using EasyHook;
 using Starship.Bot.Core;

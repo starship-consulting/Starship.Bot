@@ -17,6 +17,8 @@ namespace Starship.Bot.Plugins {
             WindowTracker = new ChangeTracker<WindowInstance>(Window);
             WindowTracker.Changed += OnWindowChanged;
             WindowTracker.StartPolling(TimeSpan.FromSeconds(1), Window.Update);
+
+            On<EditModeChanged>(mode => SetEditMode(mode.Enabled));
         }
 
         protected override void Stopped() {

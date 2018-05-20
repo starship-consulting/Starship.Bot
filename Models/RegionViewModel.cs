@@ -29,6 +29,7 @@ namespace Starship.Bot.Models {
         }
 
         public RegionViewModel(Point position) : this(new Region(position)) {
+            Name = "New Region";
         }
 
         public void Click() {

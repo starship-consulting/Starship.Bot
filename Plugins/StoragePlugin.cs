@@ -30,6 +30,14 @@ namespace Starship.Bot.Plugins {
             On<FileModified>(OnFileModified);
         }
         
+        public string GetLocalImagePath() {
+            return Environment.CurrentDirectory + @"\images\";
+        }
+
+        public string GetLocalImagePath(string regionId) {
+            return Environment.CurrentDirectory + @"\images\" + regionId + ".png";
+        }
+        
         protected override void Run() {
             LoadGameBindings();
             //LoadFromAzureTableStorage<Region>();
@@ -38,13 +46,15 @@ namespace Starship.Bot.Plugins {
         private void OnFileModified(FileModified e) {
             using(var stream = new MemoryStream(e.Data)) {
                 var image = Image.FromStream(stream);
-                image.Save(GetLocalImagePath() + e.Name);
+                var path = GetLocalImagePath();
+
+                if(!Directory.Exists(path)) {
+                    Directory.CreateDirectory(path);
+                }
+
+                image.Save(path + e.Name);
             }
             //FileProvider.Upload(e.Data, Partition, e.Name);
-        }
-
-        private string GetLocalImagePath() {
-            return Environment.CurrentDirectory + @"..\..\..\Configurations\images\";
         }
 
         private string GetLocalBindingsPath() {

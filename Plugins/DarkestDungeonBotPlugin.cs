@@ -18,6 +18,8 @@ namespace Starship.Bot.Plugins {
          
         private void OnRegionsLoaded(DataLoaded<Region> e) {
             Model.IsLoaded = true;
+
+            return;
             
             var thread = new Thread(UpdateLoop);
             thread.IsBackground = true;
@@ -30,7 +32,7 @@ namespace Starship.Bot.Plugins {
 
             return;
 
-            DarkestDungeonGame.Initialize();
+            //DarkestDungeonGame.Initialize();
 
             Planner = new BackwardChainingPlanner<DarkestDungeonViewModel>();
             

@@ -7,7 +7,7 @@ namespace Starship.Bot.AI.DarkestDungeon {
     public static class DarkestDungeonGame {
 
         // Todo:  Initialize via reflection & injection from configuration
-        public static void Initialize() {
+        static DarkestDungeonGame() {
             Regions = GameBot.Plugins.Get<RegionPlugin>();
             CampaignButton = Regions.GetRegion("CampaignButton");
         }

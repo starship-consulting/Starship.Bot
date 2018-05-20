@@ -3,11 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Starship.Bot.Windows"
+        xmlns:models="clr-namespace:Starship.Bot.Models"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance models:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="MainWindow" Width="800" Height="600" Loaded="Window_Loaded">
     <DockPanel Margin="5,5,5,5">
-        <ListBox x:Name="RegionList" DockPanel.Dock="Left" Width="200" SelectionChanged="RegionList_SelectionChanged" />
-        <TextBlock x:Name="FPS" DockPanel.Dock="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right"></TextBlock>
+        <ToolBar Height="50" VerticalAlignment="Top" DockPanel.Dock="Top" Background="White">
+            <Button Command="{Binding ScanCommand}" ToolTip="Define a new region.">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Add Region</TextBlock>
+                    <!-- <Image Source="/Starship.Bot;component/Resources/Images/scan.png" Width="32" Height="32" /> <!-->
+                </StackPanel>
+            </Button>
+        </ToolBar>
+        <ListBox x:Name="RegionList" DockPanel.Dock="Left" Width="200" SelectionChanged="RegionList_SelectionChanged" Margin="0,0,0,0" />
+        <Border Margin="5,0,0,0" BorderBrush="LightGray" BorderThickness="1">
+            <Grid DockPanel.Dock="Right">
+                <Image x:Name="RegionImage" Width="{Binding ImageWidth}" Height="{Binding ImageHeight}" Source="{Binding ImagePath}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+        <!--
+        <TextBlock x:Name="FPS" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right"></TextBlock>
+        <!-->
     </DockPanel>
 </Window>

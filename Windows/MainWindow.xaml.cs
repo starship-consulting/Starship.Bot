@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Starship.Bot.Configurations;
 using Starship.Bot.Core;
 using Starship.Bot.Events;
+using Starship.Bot.Models;
+using Starship.Bot.Plugins;
 using Starship.Core.Events;
 using Starship.Core.Extensions;
 using Starship.Win32.Extensions;
@@ -17,13 +20,15 @@ namespace Starship.Bot.Windows {
         public MainWindow() {
             InitializeComponent();
 
+            DataContext = Model = new MainWindowViewModel();
+
             Instance = this;
-            Regions = new List<VisualElement>();
+            Regions = new ObservableCollection<VisualElement>();
             RegionList.ItemsSource = Regions;
 
             EventStream.On<FrameRateUpdated>(OnFrameRateUpdated);
         }
-
+        
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             Overlay = new BotOverlay();
             Overlay.Show();
@@ -49,7 +54,7 @@ namespace Starship.Bot.Windows {
 
         private void OnFrameRateUpdated(FrameRateUpdated e) {
             this.UI(()=> {
-                FPS.Text = "FPS: " + e.FPS;
+                //FPS.Text = "FPS: " + e.FPS;
             });
         }
 
@@ -63,6 +68,14 @@ namespace Starship.Bot.Windows {
             foreach(var region in Regions) {
                 if (region == RegionList.SelectedItem) {
                     region.Select();
+                    
+                    Model.Edit(()=> {
+                        //var regionModel = GameBot.Plugins.Get<RegionPlugin>().GetRegion(region.Name);
+
+                        Model.ImagePath = GameBot.Plugins.Get<StoragePlugin>().GetLocalImagePath(region.Id.ToString());
+                        Model.ImageWidth = region.As<RectangleElement>().Width;
+                        Model.ImageHeight = region.As<RectangleElement>().Height;
+                    });
                 }
                 else {
                     region.Unselect();
@@ -72,7 +85,9 @@ namespace Starship.Bot.Windows {
 
         public static MainWindow Instance { get; set; }
 
-        private List<VisualElement> Regions { get; set; }
+        private MainWindowViewModel Model { get; set; }
+
+        private ObservableCollection<VisualElement> Regions { get; set; }
 
         private BotOverlay Overlay { get; set; }
     }

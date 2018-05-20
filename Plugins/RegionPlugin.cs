@@ -9,8 +9,9 @@ using Region = Starship.Bot.Data.Region;
 
 namespace Starship.Bot.Plugins {
     public class RegionPlugin : GamePlugin {
+
         public RegionPlugin() {
-            Regions = new List<RegionViewModel>();
+            AllRegions = new List<RegionViewModel>();
         }
 
         public override void Ready() {
@@ -29,19 +30,21 @@ namespace Starship.Bot.Plugins {
 
         public RegionViewModel GetRegion(string name) {
             name = name.ToLower();
-            return Regions.FirstOrDefault(each => each.Name.ToLower() == name);
+            return AllRegions.FirstOrDefault(each => each.Name.ToLower() == name);
         }
 
         private void OnImageCaptured(ImageCaptured e) {
-            foreach (var region in Regions) {
-                region.Scan(e.Image);
+            lock(AllRegions) {
+                foreach (var region in AllRegions) {
+                    region.Scan(e.Image);
+                }
             }
         }
 
         private void OnRegionsLoaded(DataLoaded<Region> e) {
             foreach (var region in e.Data) {
                 var viewmodel = new RegionViewModel(region);
-                Regions.Add(viewmodel);
+                AllRegions.Add(viewmodel);
 
                 //viewmodel.Exists();
                 viewmodel.AddToUI(Overlay);
@@ -66,7 +69,11 @@ namespace Starship.Bot.Plugins {
 
         private void CommitRegion() {
             if (EditingRegion != null) {
-                Regions.Add(EditingRegion);
+
+                lock(AllRegions) {
+                    AllRegions.Add(EditingRegion);
+                }
+
                 EditingRegion.Commit();
                 System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(EditingRegion));
                 EditingRegion = null;
@@ -75,7 +82,7 @@ namespace Starship.Bot.Plugins {
 
         public bool IsEnabled { get; set; }
 
-        public List<RegionViewModel> Regions { get; set; }
+        public List<RegionViewModel> AllRegions { get; set; }
 
         private Point DragOrigin { get; set; }
 
