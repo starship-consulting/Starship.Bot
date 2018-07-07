@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.Remoting;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ using Starship.Bot.Core;
 using Starship.Bot.Events;
 using Starship.Core.Extensions;
 using Starship.Core.Processing;
+using Starship.Imaging.Extensions;
+using Starship.Imaging.Wrappers;
 using Starship.Injection;
 
 namespace Starship.Bot.Plugins {
@@ -98,7 +101,7 @@ namespace Starship.Bot.Plugins {
                 var elapsed = DateTime.Now - LastFrameUpdate;
                 FrameRate = Frames / Convert.ToInt32(elapsed.TotalSeconds);
             }*/
-
+            
             if(!IsProcessingImage) {
                 IsProcessingImage = true;
 
