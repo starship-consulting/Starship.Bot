@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Starship.Bot.CK2
 {
@@ -25,47 +26,77 @@ namespace Starship.Bot.CK2
                 return;
             }
 
-            var fields = GetObject();
-            var value = new List<CK2Token>();
+            var list = new List<CK2Token>();
 
-            foreach(var field in fields) {
-                value.Add(field.Value);
+            switch(Type) {
+
+                case CK2TokenTypes.Object:
+
+                    var fields = GetObject();
+
+                    foreach(var field in fields) {
+                        field.Value.Parent = this;
+                        list.Add(field.Value);
+                    }
+
+                    break;
+
+                case CK2TokenTypes.Value:
+                    var newToken = new CK2Token(Value.ToString(), CK2TokenTypes.Value, Value);
+                    newToken.Parent = this;
+                    list.Add(newToken);
+                    break;
             }
 
-            Value = value;
+            Value = list;
             Type = CK2TokenTypes.List;
         }
         
         public CK2Token AddField(string token) {
             
+            if(Type == CK2TokenTypes.List) {
+                Add(token);
+                return this;
+            }
+
             var fields = GetObject();
-            var newToken = new CK2Token(token) { Parent = this };
 
             if(fields.ContainsKey(token)) {
                 var field = fields[token];
 
                 if(field.Type != CK2TokenTypes.List) {
-                    fields.Remove(token);
-
-                    var listToken = new CK2Token(token, CK2TokenTypes.List, new List<CK2Object> { field.GetObject() });
-                    listToken.Parent = this;
-                    fields.Add(token, listToken);
+                    field.ConvertToList();
                 }
                 
-                return fields[token];
+                return field;
             }
-
-            GetObject().Add(token, newToken);
+            
+            fields.Add(token, new CK2Token(token) { Parent = this });
 
             return fields[token];
         }
 
-        public void Add(string key, CK2TokenTypes type) {
-            GetList().Add(new CK2Token(key, type, key));
+        public CK2Token Add(string key) {
+            var list = GetList();
+            var item = list.FirstOrDefault();
+            var type = CK2TokenTypes.Undefined;
+
+            if(item != null) {
+                type = item.Type;
+            }
+
+            var token = new CK2Token(key, type, key);
+            token.Parent = this;
+
+            GetList().Add(token);
+            return token;
         }
 
         public void Add(CK2Object obj) {
-            GetList().Add(new CK2Token("", CK2TokenTypes.Object, obj));
+            var token = new CK2Token("", CK2TokenTypes.Object, obj);
+            token.Parent = this;
+
+            GetList().Add(token);
         }
 
         public void Set(object value, CK2TokenTypes type) {

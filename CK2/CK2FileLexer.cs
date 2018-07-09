@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Starship.Bot.CK2 {
 
@@ -12,31 +13,47 @@ namespace Starship.Bot.CK2 {
 
         public List<CK2Node> Read(string data) {
             Nodes = new List<CK2Node>();
+            var inQuotation = false;
+
+            data = data.Replace("\n", Environment.NewLine);
 
             foreach (var line in data.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)) {
                 var text = line.Replace("\t", "");
                 
                 foreach (var character in text) {
 
+                    var previous = Nodes.LastOrDefault();
+                    
                     if(character == '#') {
                         EndToken(CK2NodeTypes.NewLine);
                         break;
                     }
 
                     switch(character) {
-
+                        case ' ':
+                            if(!inQuotation) {
+                                EndToken(CK2NodeTypes.Whitespace);
+                            }
+                            break;
+                        case '"':
+                            Token += character;
+                            inQuotation = !inQuotation;
+                            break;
                         case '=':
                             EndToken(CK2NodeTypes.Assignment);
                             break;
-
+                        case '>':
+                            EndToken(CK2NodeTypes.GreaterThan);
+                            break;
+                        case '<':
+                            EndToken(CK2NodeTypes.LessThan);
+                            break;
                         case '{':
                             EndToken(CK2NodeTypes.LeftBrace);
                             break;
-
                         case '}':
                             EndToken(CK2NodeTypes.RightBrace);
                             break;
-
                         default:
                             Token += character;
                             break;
@@ -53,6 +70,35 @@ namespace Starship.Bot.CK2 {
             var trimmed = Token.Trim();
             Token = string.Empty;
 
+            if(type == CK2NodeTypes.Assignment || type == CK2NodeTypes.GreaterThan || type == CK2NodeTypes.GreaterThanOrEqual || type == CK2NodeTypes.LessThan || type == CK2NodeTypes.LessThanOrEqual) {
+                
+                var previous = Nodes.LastOrDefault();
+
+                if(previous != null) {
+
+                    if(type == CK2NodeTypes.Assignment) {
+                        if(previous.Type == CK2NodeTypes.GreaterThan) {
+                            previous.Type = CK2NodeTypes.GreaterThanOrEqual;
+                        }
+                        else if(previous.Type == CK2NodeTypes.LessThan) {
+                            previous.Type = CK2NodeTypes.LessThanOrEqual;
+                        }
+                    }
+
+                    if(string.IsNullOrEmpty(trimmed)) {
+                        if(previous.Type == CK2NodeTypes.Value) {
+                            previous.Type = type;
+                            previous.Value = previous.Value.ToString().Substring(1);
+                        }
+
+                        return;
+                    }
+                }
+                
+                Nodes.Add(new CK2Node(type, trimmed));
+                return;
+            }
+            
             if(!string.IsNullOrEmpty(trimmed)) {
 
                 if(trimmed.StartsWith("\"")) {
@@ -86,6 +132,10 @@ namespace Starship.Bot.CK2 {
                         }
                     }
                 }
+            }
+            
+            if(type == CK2NodeTypes.Whitespace) {
+                return;
             }
 
             Nodes.Add(new CK2Node(type));

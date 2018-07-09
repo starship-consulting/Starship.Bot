@@ -13,21 +13,32 @@ namespace Starship.Bot.CK2 {
             
             var lexer = new CK2FileLexer();
             var tokens = lexer.Read(data);
+            var exitAfterAssignment = false;
             
             foreach (var token in tokens) {
                 
                 var index = tokens.IndexOf(token);
-
-                var previous = tokens.Skip(index - 10).Take(10).ToList();
-                var next = tokens.Skip(index).Take(10).ToList();
+                var previousList = tokens.Skip(index - 10).Take(10).ToList();
+                var nextList = tokens.Skip(index).Take(10).ToList();
                 
                 switch (token.Type) {
 
+                    case CK2NodeTypes.GreaterThan:
+                    case CK2NodeTypes.LessThan:
+                    case CK2NodeTypes.GreaterThanOrEqual:
+                    case CK2NodeTypes.LessThanOrEqual:
                     case CK2NodeTypes.Assignment:
-                        Context.ConvertToValue();
+
+                        /*if(Context != null && Context.Type == CK2TokenTypes.List) {
+                            ExitContext();
+                        }*/
+
+                        exitAfterAssignment = true;
+                        EnterContext(token.Value.ToString());
                         break;
 
-                    case CK2NodeTypes.LeftBrace: // Only if it's being assigned??  Consider lists of objects
+                    case CK2NodeTypes.LeftBrace:
+                        exitAfterAssignment = false;
                         Context.ConvertToObject();
                         break;
 
@@ -40,56 +51,30 @@ namespace Starship.Bot.CK2 {
 
                     default:
                         
-                        if(Context != null) {
-                            if(Context.Type == CK2TokenTypes.Value) {
-                                Context.Value = token.Value;
-                                ExitContext();
-                                break;
-                            }
+                        if(Context.Type == CK2TokenTypes.List) {
+                            Context.Add(token.Value.ToString());
 
-                            CloseContext();
+                            if(exitAfterAssignment) {
+                                ExitContext();
+                            }
+                        }
+                        else if(Context.Type == CK2TokenTypes.Object) {
+                            Context.ConvertToList();
+                            Context.Add(token.Value.ToString());
+                        }
+                        else {
+                            Context.Set(token.Value, CK2TokenTypes.Value);
+                            ExitContext();
                         }
 
-                        EnterContext(token.Value.ToString());
-
+                        exitAfterAssignment = false;
+                        
                         break;
                 }
             }
         }
-        
-        private void CloseContext() {
-            if(Context != null && Context.Type == CK2TokenTypes.Undefined) {
-                Context.ConvertToValue();
-
-                if(Context.Value == null) {
-                    Context.Value = Context.Key;
-                }
-                
-                ExitContext();
-                Context.ConvertToList();
-            }
-        }
 
         private void ExitContext() {
-
-            todo:
-
-            /*
-            8 = {
-			        add_building = ct_guard_5
-			        add_building = ct_university_3
-			        add_building = ct_training_grounds_6
-		        }
-            */
-
-
-            /*
-            8: {
-	            add_building: [ct_guard_5, ct_university_3, ct_training_grounds_6]
-            }
-             */
-            
-            CloseContext();
             Context = Context.Parent;
         }
 
@@ -101,32 +86,15 @@ namespace Starship.Bot.CK2 {
                 Root.Add(key, value);
             }
         }
-
-        private CK2Token GetRoot(string key) {
-            if(!Root.ContainsKey(key)) {
-                Root.Add(key, new CK2Token(key, CK2TokenTypes.Value, ""));
-            }
-
-            return Root[key];
-        }
-
+        
         private void EnterContext(string key) {
 
             if (Context == null) {
-
-                var context = new CK2Token(key);
-                context.Parent = Context;
-                Context = context;
-
+                Context = new CK2Token(key);
                 SetRoot(Context.Key, Context);
             }
             else {
-                if(Context.Type == CK2TokenTypes.List) {
-                    Context.Add(key, CK2TokenTypes.Undefined);
-                }
-                else {
-                    Context = Context.AddField(key);
-                }
+                Context = Context.AddField(key);
             }
         }
         
